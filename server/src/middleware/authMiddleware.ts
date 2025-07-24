@@ -6,16 +6,18 @@ import { send } from "process";
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function verifyToken(req: Request, res: Response, next: NextFunction) {
-const token = req.body.token || req.query.token || req.headers
-['x-access-token'];
+    const authHeader = req.headers['authorization'];
+    let token;
 
-if (!token){
-    return res.status(403).send("An authentication token is required.");
-}
+if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = req.body.token || req.query.token || req.headers['x-access-token'];
+  }
 
 try {
     const decodedToken = await jwt.verify(token, JWT_SECRET);
-    req.currentUser = decodedToken;
+    (req as any).currentUser = decodedToken;
   
 } catch (error) {
     return res.status(401).send("Invalid Token Provided")
