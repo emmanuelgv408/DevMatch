@@ -1,4 +1,4 @@
-import mongoose, { Schema, model } from "mongoose";
+import mongoose, { Schema, model, Types } from "mongoose";
 
 export interface IUser extends mongoose.Document {
   name: string;
@@ -9,8 +9,8 @@ export interface IUser extends mongoose.Document {
   techStack?: string[];
   experienceLevel?: string;
   lookingFor?: string;
-  followers: mongoose.Types.ObjectId[];
-  following: mongoose.Types.ObjectId[];
+  followers: Types.Array<Types.ObjectId>;
+  following: Types.Array<Types.ObjectId>;
   friendRequests: {
     from: mongoose.Types.ObjectId;
     status: "pending" | "accepted" | "rejected";
