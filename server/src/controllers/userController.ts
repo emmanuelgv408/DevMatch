@@ -4,6 +4,9 @@ import { followUserService } from "../services/followUserService";
 import { unfollowUserService } from "../services/unfollowUserService";
 import { getFollowersService } from "../services/getFollowersService";
 import { getFollowingService } from "../services/getFollowingService";
+import { getUserByIDService } from "../services/getUserByIDService";
+import { updateUserService } from "../services/updateUserService";
+import { deleteUserService } from "../services/deleteUserService";
 
 export async function createUserController(req: Request, res: Response) {
   try {
@@ -22,7 +25,7 @@ export async function followUserController(req: Request, res: Response) {
 
     await followUserService(followerID, followingID);
 
-    res.status(201).json({ message: "Succesfully follwoed user." });
+    res.status(201).json({ message: "Succesfully followed user." });
   } catch (error: any) {
     res
       .status(500)
@@ -48,7 +51,7 @@ export async function getFollowersController(req: Request, res: Response) {
 
     res.status(200).json({ followers });
   } catch (error: any) {
-    res.status(500).json({ message: "Error getting followers." });
+    res.status(500).json({ message: "Error getting followers.", error: error.message });
   }
 }
 
@@ -60,6 +63,46 @@ export async function getFollowingController(req: Request, res: Response) {
 
     res.status(200).json({ followers });
   } catch (error: any) {
-    res.status(500).json({ message: "Error getting followers." });
+    res.status(500).json({ message: "Error getting followers.", error: error.message });
+  }
+}
+
+export async function getUserByIDController(req: Request, res: Response) {
+  try {
+    const { userId } = req.params;
+
+    const user = await getUserByIDService(userId);
+
+    res.status(200).json({ user });
+  } catch (error: any) {
+    res.status(500).json({ message: "Error retreiving profile info." , error: error.message});
+  }
+}
+
+export async function updateUserController(req: Request, res: Response) {
+  try {
+    const { userId } = req.params;
+    const { update } = req.body;
+
+    const updatedUser = await updateUserService(userId, update);
+
+    res.status(200).json({
+      message: "Succesfully updated user.",
+      user: updatedUser,
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: "Error updating the user." , error: error.message});
+  }
+}
+
+export async function deleteUserController(req: Request, res: Response) {
+  try {
+    const { userId } = req.params;
+
+    const deletedUser = await deleteUserService(userId);
+
+    res.status(200).json({ deletedUser });
+  } catch (error: any) {
+    res.status(500).json({ message: "Unable to delete the user", error: error.message});
   }
 }
