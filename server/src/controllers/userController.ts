@@ -7,6 +7,7 @@ import { getFollowingService } from "../services/getFollowingService";
 import { getUserByIDService } from "../services/getUserByIDService";
 import { updateUserService } from "../services/updateUserService";
 import { deleteUserService } from "../services/deleteUserService";
+import { searchUserService } from "../services/searchUserService";
 
 export async function createUserController(req: Request, res: Response) {
   try {
@@ -106,3 +107,19 @@ export async function deleteUserController(req: Request, res: Response) {
     res.status(500).json({ message: "Unable to delete the user", error: error.message});
   }
 }
+
+export async function searchUserController(req: Request, res: Response){
+
+try {
+  const {query, page = 1, limit = 10}= req.params;
+  const users = await searchUserService(query as string, parseInt(page as string), parseInt(limit as string)); // Request values are always strings so we must parse!
+
+  res.status(200).json({users});
+
+} catch (error: any) {
+  res.status(500).json({message: "Cannot search for the user.", error: error.message
+})
+  }
+
+}
+
