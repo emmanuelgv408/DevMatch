@@ -1,12 +1,13 @@
 import mongoose, { model, Types, Schema } from "mongoose";
 
 
-interface IPost extends mongoose.Document {
+export interface IPost extends mongoose.Document {
   userId: Types.ObjectId;
   content: string;
   createdAt: Date;
   likes: Types.ObjectId[];
   comments: Types.ObjectId[];
+  image: string;
 }
 
 const postSchema = new Schema<IPost>({
@@ -36,6 +37,11 @@ const postSchema = new Schema<IPost>({
     type: Date,
     default: Date.now,
   },
+  image:{
+    type: String,
+    required:false,
+  },
+
 });
 
 const Post = model<IPost>("Post", postSchema);
