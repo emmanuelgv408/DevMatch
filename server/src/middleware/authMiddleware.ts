@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 import { NextFunction, Request, Response } from "express";
-import { access } from "fs";
-import { send } from "process";
+
 
 const JWT_SECRET = process.env.JWT_SECRET;
 

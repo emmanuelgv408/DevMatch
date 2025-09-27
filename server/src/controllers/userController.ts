@@ -22,7 +22,12 @@ export async function createUserController(req: Request, res: Response) {
 
 export async function followUserController(req: Request, res: Response) {
   try {
-    const { followerID, followingID } = req.params;
+    const followerID = req.currentUser?.id
+
+    if(!followerID) return res.status(401)
+    .json({message: "Unauthorized"})
+
+    const { followingID } = req.params;
 
     await followUserService(followerID, followingID);
 
@@ -36,7 +41,12 @@ export async function followUserController(req: Request, res: Response) {
 
 export async function unfollowUserController(req: Request, res: Response) {
   try {
-    const { followerID, followingID } = req.params;
+    const followerID = req.currentUser?.id
+
+    if(!followerID) return res.status(401)
+    .json({message: "Unauthorized"})
+
+    const { followingID } = req.params;
 
     await unfollowUserService(followerID, followingID);
   } catch (error: any) {
@@ -82,8 +92,11 @@ export async function getUserByIDController(req: Request, res: Response) {
 
 export async function updateUserController(req: Request, res: Response) {
   try {
-    const { userId } = req.params;
+    const userId = req.currentUser?.id;
     const { update } = req.body;
+
+    if(!userId) return res.status(201)
+    .json({message: "Unauthorized"})
 
     const updatedUser = await updateUserService(userId, update);
 
@@ -98,8 +111,10 @@ export async function updateUserController(req: Request, res: Response) {
 
 export async function deleteUserController(req: Request, res: Response) {
   try {
-    const { userId } = req.params;
+    const userId = req.currentUser?.id
 
+    if (!userId) return res.status(401)
+    .json({message: "Unauthorized"})
     const deletedUser = await deleteUserService(userId);
 
     res.status(200).json({ deletedUser });

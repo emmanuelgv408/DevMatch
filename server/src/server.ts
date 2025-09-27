@@ -8,6 +8,7 @@ import express, {Request, Response} from "express";
 import mongoose from "mongoose";
 import  userRoutes from './routes/userRoutes'
 import authRoutes from './routes/authRoutes'
+import postRoutes from './routes/postRoutes'
 
 const app = express();
 
@@ -34,7 +35,9 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/api/users', userRoutes );
-app.use('/api/auth', authRoutes)
+app.use('/api/auth', authRoutes);
+app.use('api/post', postRoutes);
+
 
 
 app.listen (port, () => {
