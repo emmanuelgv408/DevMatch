@@ -4,6 +4,6 @@ import { createPostController, toggleLikesController  } from "../controllers/pos
 const router = Router()
 
 router.post("/", createPostController);
-router.post("/:postId/like")
+router.post("/:postId/like", toggleLikesController)
 
 export default router;

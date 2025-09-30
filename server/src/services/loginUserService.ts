@@ -2,8 +2,13 @@ import User, {IUser} from "../models/User"
 import jwt from "jsonwebtoken"
 const bcrypt = require('bcrypt');
 
+interface LoginResponse {
+    user: IUser
+    token: string
+}
 
-export async function loginUserService(userData: IUser): Promise<IUser>{
+
+export async function loginUserService(userData: IUser): Promise<LoginResponse>{
 
 try {
     const user = await User.findOne({email: userData.email});
@@ -19,7 +24,8 @@ try {
     );
 
 
-    return user;
+    return {user, token}
+
 } catch (error) {
     throw new Error("Failed to authenticate user.")
 }

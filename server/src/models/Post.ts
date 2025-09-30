@@ -27,12 +27,7 @@ const postSchema = new Schema<IPost>({
       ref: "User",
     },
   ],
-  comments: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Comment",
-    },
-  ],
+
   createdAt: {
     type: Date,
     default: Date.now,

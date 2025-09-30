@@ -43,4 +43,19 @@ export async function toggleLikesController (req: Request, res: Response){
     }
 } 
 
+export async function createCommentsController (req: Request, res: Response) {
+
+    try {
+       
+        const {text, postId} = req.body
+
+        
+    } catch (error: any) {
+        res.status(500)
+        .json({message: "Error creating comment", error: error.message })
+    }
+
+    
+}
+
 
