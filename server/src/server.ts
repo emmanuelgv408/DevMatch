@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 import  userRoutes from './routes/userRoutes'
 import authRoutes from './routes/authRoutes'
 import postRoutes from './routes/postRoutes'
+import commentRoutes from './routes/commentRoutes'
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/users', userRoutes );
 app.use('/api/auth', authRoutes);
 app.use('api/post', postRoutes);
+app.use('api/comment', commentRoutes )
 
 
 

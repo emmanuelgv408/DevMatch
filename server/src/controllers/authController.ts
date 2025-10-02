@@ -8,7 +8,7 @@ export async function loginUserController(req: Request, res: Response){
 
 try {
 
-    const user = await loginUserService(req.body);
+    const user = await loginUserService(req.body );
     const { password, ...userWithoutPassword } = user.toObject();
 
     const token = jwt.sign(
