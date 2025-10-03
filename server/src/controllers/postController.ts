@@ -1,47 +1,102 @@
 import { Response, Request } from "express";
 import { createPostService } from "../services/createPostService";
 import { toggleLikesService } from "../services/toggleLikesService";
+import { deletePostService } from "../services/deletePostService";
+import { getCommentsService } from "../services/getCommentsService";
+import { updatePostService } from "src/services/updatePostService";
 
-export async function createPostController(req: Request, res: Response){
+export async function createPostController(req: Request, res: Response) {
+  try {
+    const userId = req.currentUser?.id;
 
-    try {
-        const userId = req.currentUser?.id
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-        if(!userId) return res.status(201)
-        .json({message: "Unauthorized"})
+    const { content, image } = req.body;
 
-        const { content, image} = req.body
+    const newPost = await createPostService(userId, content, image);
 
-        const newPost = await createPostService(userId, content, image);
-        
-        res.status(201).json(newPost);
-
-    } catch (error: any) {
-        res.status(500)
-        .json({message: "Error creating post: ", error: error.message})
-    }
-
+    res.status(201).json(newPost);
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: "Error creating post: ", error: error.message });
+  }
 }
 
-export async function toggleLikesController (req: Request, res: Response){
+export async function toggleLikesController(req: Request, res: Response) {
+  try {
+    const { postId } = req.params;
+    const userId = req.currentUser?.id;
 
-    try {
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-        const {postId} = req.params;
-        const userId = req.currentUser?.id
+    const updatedPost = toggleLikesService(postId, userId);
+    res.status(200).json(updatedPost);
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: "Error liking post", error: error.message });
+  }
+}
 
-        if (!userId) return res.status(401).json({ message: "Unauthorized" });
+export async function deletePostController(req: Request, res: Response) {
+  try {
+    const { postId } = req.params;
+    const userId = req.currentUser?.id;
 
-        
-        const updatedPost = toggleLikesService(postId, userId);
-        res.status(200).json(updatedPost);
+    if (!postId) throw new Error("Cant find post");
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-        
-    } catch (error: any) {
-        res.status(500)
-        .json({message: "Error liking post", error: error.message })
-    }
-} 
+    const result = await deletePostService(postId, userId);
+    res.status(200).json(result);
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: "Error deleting post", error: error.message });
+  }
+}
+
+export async function getCommentsController(req: Request, res: Response) {
+  try {
+    const { postId } = req.params;
+
+    if (!postId) throw new Error("Cant find post");
+
+    const comments = await getCommentsService(postId);
+
+    res
+    .status(200)
+    .json({comments});
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: "Error getting comments", error: error.message });
+  }
+}
+
+export async function updatePostController(req: Request, res: Response){
+
+try {
+  
+  const { postId } = req.params
+  const update = req.body
+  const userId = req.currentUser?.id
+
+  if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+
+  const updatedPost = await updatePostService(postId, update, userId)
+
+  return res.status(200)
+  .json(updatedPost)
 
 
 
+} catch (error: any) {
+  res
+  .status(500)
+  .json({message: "Error updating post", error: error.message})
+}
+
+
+}
