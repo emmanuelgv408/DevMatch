@@ -18,7 +18,7 @@ else{
     post.likes.push(userId as any)
 }
 
-await post.save();
-return post;
+const updatedPost = await post.save();
+return {updatedPost, hasLiked: !hasLiked};
 
 }

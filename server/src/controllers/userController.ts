@@ -8,6 +8,7 @@ import { getUserByIDService } from "../services/getUserByIDService";
 import { updateUserService } from "../services/updateUserService";
 import { deleteUserService } from "../services/deleteUserService";
 import { searchUserService } from "../services/searchUserService";
+import { createNotificationService } from "../services/createNotificationService";
 
 export async function createUserController(req: Request, res: Response) {
   try {
@@ -30,6 +31,7 @@ export async function followUserController(req: Request, res: Response) {
     const { followingID } = req.params;
 
     await followUserService(followerID, followingID);
+    await createNotificationService(followingID, followerID, "follow");
 
     res.status(201).json({ message: "Succesfully followed user." });
   } catch (error: any) {

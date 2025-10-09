@@ -5,6 +5,7 @@ import { deletePostService } from "../services/deletePostService";
 import { getCommentsService } from "../services/getCommentsService";
 import { updatePostService } from "src/services/updatePostService";
 import { getFeedService } from "src/services/getFeedService.";
+import { createNotificationService } from "src/services/createNotificationService";
 
 export async function createPostController(req: Request, res: Response) {
   try {
@@ -31,12 +32,16 @@ export async function toggleLikesController(req: Request, res: Response) {
 
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    const updatedPost = toggleLikesService(postId, userId);
+    const { updatedPost , hasLiked } = await toggleLikesService(postId, userId);
+
+    
+    if (hasLiked && updatedPost.userId.toString() !== userId) {
+      await createNotificationService(updatedPost.userId.toString(), userId, "like", postId);
+    }
+
     res.status(200).json(updatedPost);
   } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: "Error liking post", error: error.message });
+    res.status(500).json({ message: "Error liking post", error: error.message });
   }
 }
 
@@ -103,7 +108,7 @@ export async function getFeedController(req: Request, res: Response) {
 
     return res.status(200).json(feed);
   } catch (error: any) {
-    res
+    return res
       .status(500)
       .json({ message: "Error getting feed", error: error.message });
   }
