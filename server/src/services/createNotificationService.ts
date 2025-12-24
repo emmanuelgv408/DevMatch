@@ -1,6 +1,6 @@
 import Notification, {INotification} from "../models/Notification";
 
-export async function createNotificationService(userId: string, senderId: string, type: "like" | "comment" | "follow", postId?: string) {
+export async function createNotificationService(userId: string, senderId: string, type: "like" | "comment" | "follow" |"message" , postId?: string , conversationId?: string) {
 
     try {
         
@@ -11,6 +11,7 @@ export async function createNotificationService(userId: string, senderId: string
             senderId,
             type,
             postId,
+            conversationId
           });
       
           const savedNotification = await newNotification.save();
