@@ -11,6 +11,7 @@ import authRoutes from './routes/authRoutes'
 import postRoutes from './routes/postRoutes'
 import commentRoutes from './routes/commentRoutes'
 import notificationRoutes from './routes/notificationRoutes'
+import messagesRoutes from './routes/messagesRoutes'
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/post', postRoutes);
 app.use('/api/comment', commentRoutes )
 app.use('/api/notifications', notificationRoutes )
+app.use('/api/messages', messagesRoutes)
 
 
 
