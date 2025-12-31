@@ -6,7 +6,7 @@ import { getCommentsService } from "../services/getCommentsService";
 import { updatePostService } from "src/services/updatePostService";
 import { getFeedService } from "src/services/getFeedService.";
 import { createNotificationService } from "src/services/createNotificationService";
-
+import { io, onlineUsers } from "../socket";
 export async function createPostController(req: Request, res: Response) {
   try {
     const userId = req.currentUser?.id;
@@ -34,9 +34,16 @@ export async function toggleLikesController(req: Request, res: Response) {
 
     const { updatedPost , hasLiked } = await toggleLikesService(postId, userId);
 
+    let notification;
+
     
     if (hasLiked && updatedPost.userId.toString() !== userId) {
-      await createNotificationService(updatedPost.userId.toString(), userId, "like", postId);
+      const notification = await createNotificationService(updatedPost.userId.toString(), userId, "like", postId);
+    }
+
+    const receiverSocketId = onlineUsers.get(updatedPost.userId.toString());
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("receiveNotification", notification);
     }
 
     res.status(200).json(updatedPost);

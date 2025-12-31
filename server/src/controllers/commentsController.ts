@@ -3,6 +3,7 @@ import { createCommentsService } from "../services/createCommentsService";
 import { deleteCommentService } from "../services/deleteCommentService";
 import Post from "../models/Post";
 import { createNotificationService } from "../services/createNotificationService";
+import { io, onlineUsers } from "../socket";
 
 export async function createCommentsController (req: Request, res: Response) {
 
@@ -11,6 +12,7 @@ export async function createCommentsController (req: Request, res: Response) {
         const userId = req.currentUser?.id
         const {text} = req.body
         const {postId} = req.params;
+        let notification;
 
         if(!userId) return res.status(401).json({ message: "Unauthorized" });
 
@@ -19,6 +21,11 @@ export async function createCommentsController (req: Request, res: Response) {
 
         if(post && post?.userId.toString() !== userId){
           await createNotificationService(post.userId.toString(), userId, "comment", postId)
+        }
+
+        const receiverSocketId = post ? onlineUsers.get(post.userId.toString()) : null;
+        if (receiverSocketId && notification) {
+          io.to(receiverSocketId).emit("receiveNotification", notification);
         }
 
         res.status(201).json(comment)

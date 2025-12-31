@@ -2,6 +2,7 @@ import { Response, Request } from "express";
 import { getNotificationsService } from "../services/getNotificationsService";
 import { markAsReadService } from "../services/markAsReadService";
 import { markAllAsReadService } from "../services/markAllAsReadService";
+import { getUnreadNotificationCountService } from "../services/getUnreadNotificationService";
 
 export async function getNotificationsController(req: Request, res: Response) {
   try {
@@ -55,5 +56,17 @@ export async function markAllAsReadController(req: Request, res: Response) {
     res
       .status(500)
       .json({ message: "Error marking all notifications as read", error: error.message });
+  }
+}
+
+export async function getUnreadNotificationsCountController(req: Request, res: Response) {
+  try {
+      const userId = req.currentUser?.id;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+      const count = await getUnreadNotificationCountService(userId);
+      return res.status(200).json({ unreadCount: count });
+  } catch (error: any) {
+      return res.status(500).json({ message: "Error fetching unread notifications count", error: error.message });
   }
 }

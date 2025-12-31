@@ -9,6 +9,7 @@ import { updateUserService } from "../services/updateUserService";
 import { deleteUserService } from "../services/deleteUserService";
 import { searchUserService } from "../services/searchUserService";
 import { createNotificationService } from "../services/createNotificationService";
+import {io, onlineUsers} from "../socket"
 
 export async function createUserController(req: Request, res: Response) {
   try {
@@ -31,7 +32,13 @@ export async function followUserController(req: Request, res: Response) {
     const { followingID } = req.params;
 
     await followUserService(followerID, followingID);
-    await createNotificationService(followingID, followerID, "follow");
+
+    const notification = await createNotificationService(followingID, followerID, "follow");
+
+    const receiverSocketId = onlineUsers.get(followingID);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("receiveNotification", notification);
+    }
 
     res.status(201).json({ message: "Succesfully followed user." });
   } catch (error: any) {
