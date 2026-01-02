@@ -5,6 +5,7 @@ import cors from 'cors';
 import express, {Request, Response} from "express";
 import http from "http"; 
 import { Server as SocketIOServer } from "socket.io";
+import { onlineUsers } from './socket';
 
 import mongoose from "mongoose";
 import userRoutes from './routes/userRoutes';
@@ -55,6 +56,14 @@ io.on("connection", (socket) => {
         console.log(`Socket ${socket.id} joined room ${conversationId}`);
     });
 
+    socket.on("typing", ({ conversationId, senderId, receiverId }) => {
+        const receiverSocketId = onlineUsers.get(receiverId);
+        if (receiverSocketId) {
+          io.to(receiverSocketId).emit("typing", { conversationId, senderId });
+        }
+      });
+
+      
     
     socket.on("sendMessage", (data) => {
         io.to(data.conversationId).emit("receiveMessage", data);

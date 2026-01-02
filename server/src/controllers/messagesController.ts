@@ -7,6 +7,7 @@ import { markAllMessagesAsReadService } from "../services/markAllMessagesRead";
 import { createNotificationService } from "../services/createNotificationService";
 import { io } from "src/server";
 import { onlineUsers } from "../socket";
+import Conversation from "../models/Conversation";
 
 export async function getConversationsController(req: Request, res: Response) {
   try {
@@ -97,10 +98,7 @@ export async function getMessagesController(req: Request, res: Response) {
   }
 }
 
-export async function markAllMessagesAsReadController(
-  req: Request,
-  res: Response
-) {
+export async function markAllMessagesAsReadController(req: Request,res: Response) {
   try {
     const userId = req.currentUser?.id;
     const { conversationId } = req.params;
@@ -109,8 +107,23 @@ export async function markAllMessagesAsReadController(
     if (!conversationId)
       return res.status(400).json({ message: "Conversation ID required" });
 
-    const result = await markAllMessagesAsReadService(conversationId, userId);
-    return res.status(200).json({ message: "Messages marked as read", result });
+    await markAllMessagesAsReadService(conversationId, userId);
+
+    const conversation = await Conversation.findById(conversationId);
+    if (conversation) {
+      conversation.participants.forEach((participantId) => {
+        if (participantId.toString() !== userId) {
+          const socketId = onlineUsers.get(participantId.toString());
+          if (socketId) {
+            io.to(socketId).emit("messagesRead", {
+              conversationId,
+              readerId: userId,
+            });
+          }
+        }
+      });
+    }
+    return res.status(200).json({ message: "Messages marked as read"});
   } catch (error: any) {
     return res.status(500).json({
       message: "Error marking messages as read",

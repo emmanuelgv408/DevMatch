@@ -3,6 +3,8 @@ import { getNotificationsService } from "../services/getNotificationsService";
 import { markAsReadService } from "../services/markAsReadService";
 import { markAllAsReadService } from "../services/markAllAsReadService";
 import { getUnreadNotificationCountService } from "../services/getUnreadNotificationService";
+import { io, onlineUsers } from "../socket";
+import Notification, {INotification} from "src/models/Notification";
 
 export async function getNotificationsController(req: Request, res: Response) {
   try {
@@ -32,6 +34,9 @@ export async function markAsReadController(req: Request, res: Response) {
       return res.status(400).json({message: "Notification ID is required"})
 
     const readNotification = await markAsReadService(userId, notificationId);
+    const unreadCount = await Notification.countDocuments({ userId, read: false });
+    const socketId = onlineUsers.get(userId);
+    if (socketId) io.to(socketId).emit("unreadNotifications", unreadCount);
 
     res.status(200).json(readNotification)
 
@@ -50,6 +55,9 @@ export async function markAllAsReadController(req: Request, res: Response) {
       return res.status(401).json({ message: "Unauthorized: no user found" });
 
     const result = await markAllAsReadService(userId);
+
+    const socketId = onlineUsers.get(userId);
+    if (socketId) io.to(socketId).emit("unreadNotifications", 0);
 
     res.status(200).json({ message: "All notifications marked as read", result });
   } catch (error: any) {
