@@ -5,7 +5,7 @@ import { sendMessageService } from "../services/sendMessageService";
 import { getMessagesService } from "../services/getMessagesService";
 import { markAllMessagesAsReadService } from "../services/markAllMessagesRead";
 import { createNotificationService } from "../services/createNotificationService";
-import { io } from "src/server";
+import { io } from "../server";
 import { onlineUsers } from "../socket";
 import Conversation from "../models/Conversation";
 

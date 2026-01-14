@@ -4,7 +4,7 @@ import { markAsReadService } from "../services/markAsReadService";
 import { markAllAsReadService } from "../services/markAllAsReadService";
 import { getUnreadNotificationCountService } from "../services/getUnreadNotificationService";
 import { io, onlineUsers } from "../socket";
-import Notification, {INotification} from "src/models/Notification";
+import Notification, {INotification} from "../models/Notification";
 
 export async function getNotificationsController(req: Request, res: Response) {
   try {

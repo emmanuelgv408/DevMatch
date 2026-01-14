@@ -3,9 +3,9 @@ import { createPostService } from "../services/createPostService";
 import { toggleLikesService } from "../services/toggleLikesService";
 import { deletePostService } from "../services/deletePostService";
 import { getCommentsService } from "../services/getCommentsService";
-import { updatePostService } from "src/services/updatePostService";
-import { getFeedService } from "src/services/getFeedService.";
-import { createNotificationService } from "src/services/createNotificationService";
+import { updatePostService } from "../services/updatePostService";
+import { getFeedService } from "../services/getFeedService.";
+import { createNotificationService } from "../services/createNotificationService";
 import { io, onlineUsers } from "../socket";
 export async function createPostController(req: Request, res: Response) {
   try {

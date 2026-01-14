@@ -16,7 +16,7 @@ if (authHeader && authHeader.startsWith("Bearer ")) {
 
 try {
     const decodedToken = await jwt.verify(token, JWT_SECRET);
-    (req as any).currentUser = decodedToken;
+    req.currentUser = decodedToken;
   
 } catch (error) {
     return res.status(401).send("Invalid Token Provided")

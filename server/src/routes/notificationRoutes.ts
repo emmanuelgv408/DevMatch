@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import { verifyToken } from "../middleware/authMiddleware";
-import { getNotificationsController, markAsReadController, markAllAsReadController, getUnreadNotificationsCountController } from "src/controllers/notificationsController";
+import { getNotificationsController, markAsReadController, markAllAsReadController, getUnreadNotificationsCountController } from "../controllers/notificationsController";
 
 const router = Router()
 
