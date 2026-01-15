@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"
+import toast from "react-hot-toast"
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -6,60 +8,63 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const BASE_URL = import.meta.env.VITE_BASE_URL; 
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
+  const navigate = useNavigate();
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  try {
-    const res = await fetch(`${BASE_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch(`${BASE_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data.message || "Login failed");
-    }
+      if (!res.ok) {
+        throw new Error(data.message || "Login failed");
+      }
 
-    console.log("Login successful:", data);
+      localStorage.setItem("token", data.token);
+
     
-  } catch (err: any) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+      localStorage.setItem("user", JSON.stringify(data.user));
+    
 
+      navigate("/feed");
+
+      console.log("Login successful:", data);
+      toast.success("Welcome back 👋")
+  
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center px-2 sm:px-4">
       {/* Navbar */}
-      <nav className="flex justify-between items-center w-full max-w-md mb-8">
-        <div className="border p-1 bg-black rounded-xl">
-          <h2 className="font-extrabold text-2xl">
+      <nav className="flex flex-col sm:flex-row justify-center items-center w-full sm:max-w-md mb-8">
+        <div className="border p-1 bg-black rounded-xl mb-2 sm:mb-0">
+          <h2 className="font-extrabold text-2xl text-center sm:text-left">
             <span className="text-white">Dev</span>
             <span className="text-blue-700">Match</span>
           </h2>
         </div>
 
-        <div className="flex space-x-2">
-          <button className="border border-blue-700 text-blue-700 rounded-xl px-3 py-1 hover:bg-blue-700 hover:text-white transition cursor-pointer">
-            Welcome Back
-          </button>
-          <button className="border text-white bg-black rounded-xl px-3 py-1 hover:bg-gray-700 transition cursor-pointer">
-            Join Now
-          </button>
-        </div>
       </nav>
 
       {/* Login Form */}
-      <div className="w-full max-w-md bg-gray-800 p-6 rounded-xl shadow-md">
-        <h3 className="text-white text-xl font-semibold mb-4">Login to your account</h3>
+      <div className="w-full sm:max-w-md bg-gray-800 p-6 rounded-xl shadow-md mx-2 sm:mx-0">
+        <h3 className="text-white text-xl font-semibold mb-4 text-center sm:text-left">
+          Login to your account
+        </h3>
 
         {error && (
           <div className="mb-4 text-red-500 font-medium text-sm">{error}</div>
@@ -72,7 +77,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 rounded-md border border-gray-600 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-700"
+              className="mt-1 block w-full px-3 py-2 rounded-md border border-gray-600 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-700 sm:text-base"
               required
             />
           </div>
@@ -83,7 +88,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 rounded-md border border-gray-600 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-700"
+              className="mt-1 block w-full px-3 py-2 rounded-md border border-gray-600 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-700 sm:text-base"
               required
             />
           </div>
@@ -95,6 +100,15 @@ const handleSubmit = async (e: React.FormEvent) => {
           >
             {loading ? "Logging in..." : "Login"}
           </button>
+
+          <button
+      type="button" 
+      onClick={() => navigate("/register")} 
+      className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-black/80 transition cursor-pointer"
+    >
+      Register
+    </button>
+
         </form>
       </div>
     </div>
