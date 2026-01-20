@@ -14,7 +14,7 @@ import './index.css'
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-800 text-white">
+      <div className="min-h-screen bg-black text-white">
         <Routes>
           {/* App layout */}
           <Route path="/" element={<App />}>
