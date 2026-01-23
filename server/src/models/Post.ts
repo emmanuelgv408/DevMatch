@@ -6,7 +6,6 @@ export interface IPost extends mongoose.Document {
   content: string;
   createdAt: Date;
   likes: Types.ObjectId[];
-  comments: Types.ObjectId[];
   image: string;
 }
 

@@ -24,5 +24,5 @@ export async function getFeedService(userId: string, page = 1, limit = 10) {
     })
   );
   
-  return posts;
+  return postsWithComments;
 }

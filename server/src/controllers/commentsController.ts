@@ -17,6 +17,9 @@ export async function createCommentsController (req: Request, res: Response) {
         if(!userId) return res.status(401).json({ message: "Unauthorized" });
 
         const comment = await createCommentsService(postId, userId, text)
+
+        await comment.populate("userId", "name username avatar userId");
+
         const post = await Post.findById(postId)
 
         if(post && post?.userId.toString() !== userId){

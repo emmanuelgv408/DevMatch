@@ -89,13 +89,13 @@ const Post: React.FC<PostProps> = ({ post, onLikeToggle }) => {
   const addComment = async () => {
     if (!newComment.trim()) return;
     try {
-      const res = await fetch(`${BASE_URL}/api/comments`, {
+      const res = await fetch(`${BASE_URL}/api/comment/${post._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ postId: post._id, text: newComment }),
+        body: JSON.stringify({text: newComment }),
       });
       if (!res.ok) throw new Error("Failed to add comment");
 

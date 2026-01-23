@@ -4,7 +4,7 @@ import { verifyToken } from "../middleware/authMiddleware";
 
 const router = Router();
 
-router.post("/",verifyToken, createCommentsController );
+router.post("/:postId",verifyToken, createCommentsController );
 router.delete("/:commentId", verifyToken, deleteCommentController)
 
 export default router;
