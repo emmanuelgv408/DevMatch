@@ -16,5 +16,13 @@ export async function getFeedService(userId: string, page = 1, limit = 10) {
   .limit(limit)
   .populate("userId", "name avatar username");
 
+  const postsWithComments = await Promise.all(
+    posts.map(async (post) => {
+      const comments = await Comment.find({ postId: post._id })
+        .populate("userId", "name avatar username");
+      return { ...post.toObject(), comments };
+    })
+  );
+  
   return posts;
 }
