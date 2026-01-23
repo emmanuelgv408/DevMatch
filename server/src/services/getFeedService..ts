@@ -1,5 +1,6 @@
 import User, { IUser } from "../models/User";
 import Post, { IPost } from "../models/Post";
+import Comment from "../models/Comment";
 
 export async function getFeedService(userId: string, page = 1, limit = 10) {
   const user = await User.findById(userId);
