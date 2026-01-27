@@ -6,6 +6,7 @@ import { getCommentsService } from "../services/getCommentsService";
 import { updatePostService } from "../services/updatePostService";
 import { getFeedService } from "../services/getFeedService.";
 import { createNotificationService } from "../services/createNotificationService";
+import { uploadService } from "../services/uploadService";
 import { io, onlineUsers } from "../socket";
 export async function createPostController(req: Request, res: Response) {
   try {
@@ -13,9 +14,14 @@ export async function createPostController(req: Request, res: Response) {
 
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    const { content, image } = req.body;
+    const { content} = req.body;
+    let imageUrl: string | undefined;
 
-    const newPost = await createPostService(userId, content, image);
+    if (req.file) {
+      const uploadResult = await uploadService(req.file, "posts");
+    }
+
+    const newPost = await createPostService(userId, content, imageUrl);
 
     res.status(201).json(newPost);
   } catch (error: any) {

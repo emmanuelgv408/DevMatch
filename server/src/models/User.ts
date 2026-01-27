@@ -32,7 +32,7 @@ const userSchema = new Schema<IUser>(
       trim: true,
     },
     password: { type: String, required: true },
-    avatar: { type: String, default: "" },
+    avatar: { type: String, default: "https://res.cloudinary.com/dliqgqmbr/image/upload/v1769553977/default-avatar_j1g4to.webp" },
     bio: { type: String, default: "" },
     techStack: { type: [String], default: [] },
     experienceLevel: { type: String, default: "beginner" },
