@@ -9,6 +9,7 @@ import { updateUserService } from "../services/updateUserService";
 import { deleteUserService } from "../services/deleteUserService";
 import { searchUserService } from "../services/searchUserService";
 import { createNotificationService } from "../services/createNotificationService";
+import { uploadService } from "../services/uploadService";
 import {io, onlineUsers} from "../socket"
 
 export async function createUserController(req: Request, res: Response) {
@@ -147,3 +148,19 @@ try {
 
 }
 
+
+export async function  uploadProfilePicController (req: Request, res: Response)  {
+  try {
+    const userId = req.currentUser?.id;
+    if (!userId || !req.file)
+      return res.status(400).json({ message: "No file uploaded" });
+
+
+    const { url } = await uploadService(req.file, "profiles");
+    const updatedUser = await updateUserService(userId, { avatar: url });
+
+    res.status(200).json(updatedUser);
+  } catch (error: any) {
+    res.status(500).json({ message: "Error uploading profile pic", error: error.message });
+  }
+};
