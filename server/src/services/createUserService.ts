@@ -24,7 +24,7 @@ export async function createUserService(userData: IUser) {
       username: userData.username,
       email: userData.email,
       password: hashedPassword,
-      avatar: userData.avatar || "",
+      ...(userData.avatar && { avatar: userData.avatar }),
       bio: userData.bio || "",
       techStack: userData.techStack || [],
       experienceLevel: userData.experienceLevel || "beginner",

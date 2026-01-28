@@ -14,16 +14,26 @@ export async function createPostController(req: Request, res: Response) {
 
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    const { content} = req.body;
-    let imageUrl: string | undefined;
+    console.log("Request body:", req.body);
+    console.log("Request file:", req.file);
+
+    const {content} = req.body;
+    let imageUrl: string | undefined = undefined;
 
     if (req.file) {
-      const uploadResult = await uploadService(req.file, "posts");
+      try {
+        const uploadResult = await uploadService(req.file, "posts");
+      imageUrl = uploadResult.url;
+      } catch (error: any) {
+        console.error("Cloudinary upload error:", error.message);
+        return res.status(500).json({ message: "Failed to upload image", error: error.message});
+      }
+      
     }
 
     const newPost = await createPostService(userId, content, imageUrl);
 
-    res.status(201).json(newPost);
+    res.status(201).json({post: newPost});
   } catch (error: any) {
     res
       .status(500)
