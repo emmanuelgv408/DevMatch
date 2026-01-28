@@ -100,7 +100,11 @@ const Post: React.FC<PostProps> = ({ post, onLikeToggle }) => {
       if (!res.ok) throw new Error("Failed to add comment");
 
       const data = await res.json();
-      setComments((prev) => [...prev, data.comment]);
+      if (!data || !data.userId) {
+        console.error("BAD COMMENT SHAPE", data);
+      }
+      
+      setComments((prev) => [...prev, data]);
       setNewComment("");
       setShowCommentInput(false);
     } catch (err: any) {
@@ -113,7 +117,7 @@ const Post: React.FC<PostProps> = ({ post, onLikeToggle }) => {
       {/* User info */}
       <div className="flex items-center mb-2">
         <img
-          src={post.userId.avatar || "/default-avatar.png"}
+          src={post.userId.avatar}
           alt={post.userId.name}
           className="w-10 h-10 rounded-full mr-3"
         />
@@ -172,7 +176,7 @@ const Post: React.FC<PostProps> = ({ post, onLikeToggle }) => {
         {(showAllComments ? comments : comments.slice(0, 2)).map((c) => (
           <div key={c._id} className="flex items-start gap-2 mt-1">
             <img
-              src={c.userId.avatar || "/default-avatar.png"}
+              src={c.userId.avatar }
               alt={c.userId.name}
               className="w-6 h-6 rounded-full"
             />

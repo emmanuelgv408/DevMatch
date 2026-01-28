@@ -7,13 +7,17 @@ const post = await Post.findById(postId);
 
 if(!post) throw new Error("Cant find the post.")
 
-const comment = new Comment({
+const comment = await new Comment({
 postId,
 userId,
 text
 })
 
+await comment.populate("userId","name avatar username")
 await comment.save();
+
+
+
 
 return comment
     

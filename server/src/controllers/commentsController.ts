@@ -18,8 +18,6 @@ export async function createCommentsController (req: Request, res: Response) {
 
         const comment = await createCommentsService(postId, userId, text)
 
-        await comment.populate("userId", "name username avatar userId");
-
         const post = await Post.findById(postId)
 
         if(post && post?.userId.toString() !== userId){
