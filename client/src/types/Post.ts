@@ -6,12 +6,6 @@ export interface User {
     avatar: string;
   }
   
-  export interface Comment {
-    _id: string;
-    userId: User;
-    text: string;
-    createdAt: string;
-  }
   
   export interface PostType {
     _id: string;
@@ -28,4 +22,4 @@ export interface User {
     onLikeToggle: () => void;
     onPostDeleted?: (postId: string) => void;
   }
-  
+

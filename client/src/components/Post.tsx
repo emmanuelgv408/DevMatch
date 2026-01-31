@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import {  type Comment, type PostProps } from "../types/Post";
+import { type PostProps } from "../types/Post"
+import {type CommentProps, type CommentType} from "../types/Comment"
+import Comment from "./Comment";
+
 
 // Inline SVG components
 const LikeIcon = ({ active }: { active: boolean }) => (
@@ -42,7 +45,7 @@ const TrashIcon = () => (
 
 const Post: React.FC<PostProps> = ({ post, onLikeToggle, onPostDeleted }) => {
   const [likes, setLikes] = useState(post.likes || []);
-  const [comments, setComments] = useState<Comment[]>(post.comments || []);
+  const [comments, setComments] = useState<CommentType[]>(post.comments as unknown as CommentType[] || []);
   const [newComment, setNewComment] = useState("");
   const [showAllComments, setShowAllComments] = useState(false);
   const [showCommentInput, setShowCommentInput] = useState(false);
@@ -113,6 +116,7 @@ const Post: React.FC<PostProps> = ({ post, onLikeToggle, onPostDeleted }) => {
     }
   };
 
+
   return (
     <div className="bg-gray-900 rounded-lg p-4 mb-4 shadow-md">
       {/* Delete button for post owner */}
@@ -182,33 +186,29 @@ const Post: React.FC<PostProps> = ({ post, onLikeToggle, onPostDeleted }) => {
       )}
 
       {/* Display some comments */}
-      <div className="mt-2">
-        {(showAllComments ? comments : comments.slice(0, 2)).map((c) => (
-          <div key={c._id} className="flex items-start gap-2 mt-1">
-            <img
-              src={c.userId.avatar }
-              alt={c.userId.name}
-              className="w-6 h-6 rounded-full"
-            />
-            <div>
-              <p className="text-white text-sm">
-                <span className="font-semibold">{c.userId.name}</span> {c.text}
-              </p>
-              <p className="text-gray-500 text-xs">
-                {new Date(c.createdAt).toLocaleString()}
-              </p>
-            </div>
-          </div>
-        ))}
-        {comments.length > 2 && (
-          <button
-            className="text-blue-500 text-xs mt-1"
-            onClick={() => setShowAllComments(!showAllComments)}
-          >
-            {showAllComments ? "Hide" : `View all ${comments.length} comments`}
-          </button>
-        )}
-      </div>
+<div className="mt-2">
+  {(showAllComments ? comments : comments.slice(0, 2)).map((comment) => (
+    <Comment
+      key={comment._id}
+      comment={comment}
+      onCommentDeleted={(commentId) =>
+        setComments((prev) =>
+          prev.filter((c) => c._id !== commentId)
+        )
+      }
+    />
+  ))}
+
+  {comments.length > 2 && (
+    <button
+      className="text-blue-500 text-xs mt-1"
+      onClick={() => setShowAllComments(!showAllComments)}
+    >
+      {showAllComments ? "Hide" : `View all ${comments.length} comments`}
+    </button>
+  )}
+</div>
+
 
       <p className="text-gray-500 text-xs mt-2">
         {new Date(post.createdAt).toLocaleString()}
