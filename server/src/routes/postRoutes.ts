@@ -6,7 +6,7 @@ const router = Router()
 
 router.post("/", parser.single("image"), verifyToken,createPostController);
 router.post("/:postId/like",verifyToken, toggleLikesController)
-router.delete("/postId",verifyToken, deletePostController)
+router.delete("/:postId",verifyToken, deletePostController)
 router.get("/:postId/comments", verifyToken, getCommentsController);
 router.put("/:postId", verifyToken, updatePostController)
 router.get("/feed", verifyToken, getFeedController)

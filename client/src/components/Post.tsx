@@ -1,33 +1,5 @@
 import React, { useState } from "react";
-
-interface User {
-  _id: string;
-  name: string;
-  username: string;
-  avatar: string;
-}
-
-interface Comment {
-  _id: string;
-  userId: User;
-  text: string;
-  createdAt: string;
-}
-
-interface PostType {
-  _id: string;
-  userId: User;
-  content: string;
-  createdAt: string;
-  likes: string[];
-  comments: Comment[];
-  image?: string;
-}
-
-interface PostProps {
-  post: PostType;
-  onLikeToggle: () => void;
-}
+import {  type Comment, type PostProps } from "../types/Post";
 
 // Inline SVG components
 const LikeIcon = ({ active }: { active: boolean }) => (
@@ -56,8 +28,19 @@ const CommentIcon = ({ active }: { active: boolean }) => (
   </svg>
 );
 
+const TrashIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={`w-4 h-4 text-white`}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+  >
+    <path d="M9 3h6l1 2h5v2H3V5h5l1-2zm1 7h2v8h-2v-8zm4 0h2v8h-2v-8zM7 10h2v8H7v-8zm-1 12c-1.1 0-2-.9-2-2V7h16v13c0 1.1-.9 2-2 2H6z" />
+  </svg>
+);
 
-const Post: React.FC<PostProps> = ({ post, onLikeToggle }) => {
+
+const Post: React.FC<PostProps> = ({ post, onLikeToggle, onPostDeleted }) => {
   const [likes, setLikes] = useState(post.likes || []);
   const [comments, setComments] = useState<Comment[]>(post.comments || []);
   const [newComment, setNewComment] = useState("");
@@ -68,6 +51,7 @@ const Post: React.FC<PostProps> = ({ post, onLikeToggle }) => {
   const token = localStorage.getItem("token");
   const currentUserId = JSON.parse(localStorage.getItem("user") || "{}")._id;
   const isLiked = likes.includes(currentUserId);
+  const isOwner = post.userId._id === currentUserId;
 
   const toggleLike = async () => {
     try {
@@ -111,9 +95,35 @@ const Post: React.FC<PostProps> = ({ post, onLikeToggle }) => {
       console.error(err.message);
     }
   };
+  const handleDeletePost = async () => {
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
+  
+    try {
+      const res = await fetch(`${BASE_URL}/api/post/${post._id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      if (!res.ok) throw new Error("Failed to delete post");
+  
+      
+      if (onPostDeleted) onPostDeleted(post._id);
+    } catch (err: any) {
+      console.error(err.message);
+    }
+  };
 
   return (
     <div className="bg-gray-900 rounded-lg p-4 mb-4 shadow-md">
+      {/* Delete button for post owner */}
+      {isOwner && (
+        <button
+          onClick={handleDeletePost}
+          className="text-red-500 text-sm float-right"
+        >
+          <TrashIcon/>
+        </button>
+      )}
       {/* User info */}
       <div className="flex items-center mb-2">
         <img

@@ -2,23 +2,7 @@ import React, { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
 import Post from "../components/Post";
 import CreatePost from "../components/CreatePostButton";
-
-interface User {
-  _id: string;
-  name: string;
-  username: string;
-  avatar: string;
-}
-
-interface PostType {
-  _id: string;
-  userId: User;
-  content: string;
-  createdAt: string;
-  likes: string[];
-  comments: string[];
-  image?: string;
-}
+import { type PostType,  type User } from "../types/Post";
 
 function Feed() {
   const [posts, setPosts] = useState<PostType[]>([]);
@@ -59,9 +43,6 @@ function Feed() {
 
       <div className="max-w-3xl mx-auto py-6 px-4">
         <CreatePost
-          currentUser={currentUser}
-          BASE_URL={BASE_URL}
-          token={token}
           onPostCreated={fetchFeed}
         />
 
@@ -73,8 +54,12 @@ function Feed() {
         )}
 
         {posts.map((post) => (
-          <Post key={post._id} post={post} />
-        ))}
+          <Post key={post._id} 
+          post={post}
+          onLikeToggle={fetchFeed}
+          onPostDeleted={fetchFeed}
+           />
+        ))} 
       </div>
     </div>
   );
