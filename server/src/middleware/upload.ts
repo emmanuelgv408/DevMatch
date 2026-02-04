@@ -1,23 +1,11 @@
 import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
 
 
-import CloudinaryStorage from "multer-storage-cloudinary";
-
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUD_KEY,
-  api_secret: process.env.CLOUD_SECRET,
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, 
+  },
 });
 
-const storage = new (CloudinaryStorage as any)({
-  cloudinary: cloudinary,
-  params: {
-    folder: "profiles",
-    allowed_formats: ["jpg", "jpeg", "png"],
-  },
-}) as any;
-
-const parser = multer({ storage });
-
-export default parser;
+export default upload;
