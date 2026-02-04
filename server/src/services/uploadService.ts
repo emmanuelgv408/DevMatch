@@ -1,6 +1,5 @@
 import { Readable } from "stream";
 
-// IMPORTANT: require Cloudinary for runtime correctness
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
