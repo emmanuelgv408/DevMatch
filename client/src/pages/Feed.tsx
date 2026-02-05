@@ -38,8 +38,8 @@ function Feed() {
   }, [BASE_URL, token]);
 
   return (
-    <div className="bg-gray-800 min-h-screen">
-      <NavBar />
+    <div className="">
+
 
       <div className="max-w-3xl mx-auto py-6 px-4">
         <CreatePost

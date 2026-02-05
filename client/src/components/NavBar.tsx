@@ -8,12 +8,13 @@ import profileIcon from "../assets/profile-icon.svg";
 
 const Navbar = () => {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const currentUserId = JSON.parse(localStorage.getItem("user") || "{}")._id;
 
   const navLinks = [
     { to: "/friends", icon: friendsIcon, label: "Friends" },
     { to: "/chat", icon: chatIcon, label: "Chat" },
     { to: "/notifications", icon: notificationsIcon, label: "Notifications" },
-    { to: "/profile", icon: profileIcon, label: "Profile" },
+    { to: `/profile/${currentUserId}`, icon: profileIcon, label: "Profile"}
   ];
 
   return (
@@ -21,7 +22,7 @@ const Navbar = () => {
       <div className="mx-auto flex max-w-7xl items-center px-4 py-3">
         {/* Logo */}
         <Link
-          to="/"
+          to="/feed"
           className="text-xl font-bold text-blue-600 md:text-2xl flex-shrink-0"
         >
           <span className="text-white">Dev</span>Match

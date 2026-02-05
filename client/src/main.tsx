@@ -1,43 +1,41 @@
- 
-import React from "react"
-import ReactDOM from "react-dom/client"
-import { BrowserRouter, Routes, Route } from "react-router-dom"
-import { Toaster } from "react-hot-toast"
-import App from "./app/App"
-import Login from "./pages/Login"
-import Register from './pages/Register'
-import Feed from './pages/Feed'
-import './index.css'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Feed from "./pages/Feed";
+import Profile from "./pages/Profile";
+import AppLayout from "./layout/AppLayout";
 
+import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
-      <div className="min-h-screen bg-black text-white">
-        <Routes>
-          {/* App layout */}
-          <Route path="/" element={<App />}>
-            {/* Nested routes can go here later */}
-          </Route>
+      <Routes>
+        {/* Public routes (NO navbar) */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-          {/* Auth pages */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+        {/* App routes (WITH navbar) */}
+        <Route element={<AppLayout />}>
           <Route path="/feed" element={<Feed />} />
-        </Routes>
+          <Route path="/profile/:userId" element={<Profile />} />
+        </Route>
+      </Routes>
 
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            duration: 3000,
-            style: {
-              background: "#111827",
-              color: "#fff",
-            },
-          }}
-        />
-      </div>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#111827",
+            color: "#fff",
+          },
+        }}
+      />
     </BrowserRouter>
   </React.StrictMode>
 );
