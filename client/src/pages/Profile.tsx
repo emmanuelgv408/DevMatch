@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { type User,  } from "../types/User";
+import { type User } from "../types/User";
 import { type PostType } from "../types/Post";
+import Post from "../components/Post";
 
 const Profile = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -14,26 +15,33 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
 
-  const isOwnProfile = currentUser._id === userId
+  const isOwnProfile = currentUser._id === userId;
+
+  const refetchProfile = async () => {
+    if (!userId) return;
+
+    const res = await fetch(`${BASE_URL}/api/users/${userId}/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    setPosts(data.posts || []);
+  };
 
   useEffect(() => {
     if (!userId) return;
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch(
-          `${BASE_URL}/api/users/${userId}/profile`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await fetch(`${BASE_URL}/api/users/${userId}/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         const data = await res.json();
-        console.log(data)
+        console.log(data);
         setUser(data.user);
-   
+
         setPosts(data.posts || []);
         setIsFollowing(data.isFollowing);
       } catch (err) {
@@ -50,15 +58,12 @@ const Profile = () => {
     try {
       const endpoint = isFollowing ? "unfollow" : "follow";
 
-      await fetch(
-        `${BASE_URL}/api/users/${endpoint}/${userId}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await fetch(`${BASE_URL}/api/users/${endpoint}/${userId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setIsFollowing(!isFollowing);
       setUser((prev) =>
@@ -75,7 +80,9 @@ const Profile = () => {
   };
 
   if (loading) {
-    return <div className="text-center text-gray-400 mt-10">Loading profile...</div>;
+    return (
+      <div className="text-center text-gray-400 mt-10">Loading profile...</div>
+    );
   }
 
   if (!user) {
@@ -94,20 +101,31 @@ const Profile = () => {
           />
 
           <div className="flex-1">
-            <h2 className="text-xl font-semibold text-white">{user.username}</h2>
-            <p className="text-gray-400 text-sm mt-1">
-              {user.bio || "No bio yet"}
-            </p>
+            <h2 className="text-xl font-semibold text-white">{user.name}</h2>
+            <p className="text-gray-400 text-sm mt-1">@{user.username}</p>
+            <p className="text-gray-400 text-sm mt-1">{user.bio || "No bio yet"}</p>
 
             <div className="flex gap-6 mt-3 text-gray-300 text-sm">
               <span>
-                <strong className="text-white">{user.followers.length}</strong>{" "}
-                Followers
+                <strong className="text-white">{user.followers.length}</strong> Followers
               </span>
               <span>
-                <strong className="text-white">{user.following.length}</strong>{" "}
-                Following
+                <strong className="text-white">{user.following.length}</strong> Following
               </span>
+            </div>
+
+            {/* Tech Stack and Looking For */}
+            <div className="mt-2 text-gray-300 text-sm space-y-1">
+              {user.techStack.length > 0 && (
+                <p>
+                  <strong className="text-white">Tech Stack:</strong> {user.techStack.join(", ")}
+                </p>
+              )}
+              {user.lookingFor && (
+                <p>
+                  <strong className="text-white">Looking for:</strong> {user.lookingFor}
+                </p>
+              )}
             </div>
           </div>
 
@@ -121,9 +139,7 @@ const Profile = () => {
               <button
                 onClick={handleFollowToggle}
                 className={`px-4 py-1 rounded-md text-white ${
-                  isFollowing
-                    ? "bg-gray-700 hover:bg-gray-600"
-                    : "bg-blue-700 hover:bg-blue-800"
+                  isFollowing ? "bg-gray-700 hover:bg-gray-600" : "bg-blue-700 hover:bg-blue-800"
                 }`}
               >
                 {isFollowing ? "Unfollow" : "Follow"}
@@ -134,31 +150,15 @@ const Profile = () => {
       </div>
 
       {/* Posts Section */}
-      <div className="mt-6 space-y-4">
-        {posts.length === 0 ? (
-          <p className="text-gray-400 text-center">No posts yet</p>
-        ) : (
-          posts.map((post) => (
-            <div
-              key={post._id}
-              className="bg-gray-900 p-4 rounded-lg shadow"
-            >
-              <p className="text-white">{post.content}</p>
-
-              {post.image && (
-                <img
-                  src={post.image}
-                  alt="post"
-                  className="mt-3 rounded-md max-h-96 object-cover"
-                />
-              )}
-
-              <p className="text-gray-500 text-xs mt-2">
-                {new Date(post.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-          ))
-        )}
+      <div className="mt-3">
+        {posts.map((post) => (
+          <Post
+            key={post._id}
+            post={post}
+            onLikeToggle={refetchProfile}
+            onPostDeleted={refetchProfile}
+          />
+        ))}
       </div>
     </div>
   );

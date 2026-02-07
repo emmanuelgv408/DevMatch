@@ -6,7 +6,7 @@ export async function getPostsByUserService(userId: string) {
     throw new Error("Invalid user ID");
   }
 
-  const posts = Post.find({userId})
+  const posts = Post.find({userId}).populate("userId","username name avatar")
 
   return posts
     .sort({ createdAt: -1 })

@@ -12,6 +12,7 @@ import { getPostsByUserService } from "../services/getPostByUserService";
 import { createNotificationService } from "../services/createNotificationService";
 import { uploadService } from "../services/uploadService";
 import {io, onlineUsers} from "../socket"
+import User from "../models/User";
 
 export async function createUserController(req: Request, res: Response) {
   try {
@@ -92,12 +93,19 @@ export async function getFollowingController(req: Request, res: Response) {
 export async function getUserByIDController(req: Request, res: Response) {
   try {
     const { userId } = req.params;
+    const currentUser = req.currentUser?.id
+
 
     const user = await getUserByIDService(userId);
     const posts = await getPostsByUserService(userId);
+
+    const isFollowing = await User.exists({
+      _id: userId,
+      followers: currentUser,
+    })
    
 
-    res.status(200).json({ user, posts });
+    res.status(200).json({ user, posts, isFollowing: Boolean(isFollowing) });
   } catch (error: any) {
     res.status(500).json({ message: "Error retreiving profile info." , error: error.message});
   }
