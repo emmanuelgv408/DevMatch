@@ -1,34 +1,20 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
-interface User {
-  _id: string;
-  username: string;
-  bio?: string;
-  profilePic?: string;
-  followersCount: number;
-  followingCount: number;
-}
-
-interface Post {
-  _id: string;
-  content: string;
-  image?: string;
-  createdAt: string;
-}
+import { type User,  } from "../types/User";
+import { type PostType } from "../types/Post";
 
 const Profile = () => {
   const { userId } = useParams<{ userId: string }>();
   const token = localStorage.getItem("token");
-  const currentUserId = localStorage.getItem("userId");
+  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const [user, setUser] = useState<User | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
 
-  const isOwnProfile = currentUserId === userId;
+  const isOwnProfile = currentUser._id === userId
 
   useEffect(() => {
     if (!userId) return;
@@ -45,7 +31,9 @@ const Profile = () => {
         );
 
         const data = await res.json();
+        console.log(data)
         setUser(data.user);
+   
         setPosts(data.posts || []);
         setIsFollowing(data.isFollowing);
       } catch (err) {
@@ -77,7 +65,7 @@ const Profile = () => {
         prev
           ? {
               ...prev,
-              followersCount: prev.followersCount + (isFollowing ? -1 : 1),
+              followersCount: prev.followers.length + (isFollowing ? -1 : 1),
             }
           : prev
       );
@@ -100,7 +88,7 @@ const Profile = () => {
       <div className="bg-gray-900 rounded-xl p-6 shadow-md">
         <div className="flex items-center gap-6">
           <img
-            src={user.profilePic || "/default-avatar.png"}
+            src={user.avatar || "/default-avatar.png"}
             alt="profile"
             className="w-24 h-24 rounded-full object-cover border border-gray-700"
           />
@@ -113,11 +101,11 @@ const Profile = () => {
 
             <div className="flex gap-6 mt-3 text-gray-300 text-sm">
               <span>
-                <strong className="text-white">{user.followersCount}</strong>{" "}
+                <strong className="text-white">{user.followers.length}</strong>{" "}
                 Followers
               </span>
               <span>
-                <strong className="text-white">{user.followingCount}</strong>{" "}
+                <strong className="text-white">{user.following.length}</strong>{" "}
                 Following
               </span>
             </div>

@@ -4,6 +4,7 @@ import User, { IUser } from "../models/User";
 
 
 
+
 export async function getUserByIDService(userID: string) {
   try {
     if (!Types.ObjectId.isValid(userID)) {
@@ -13,14 +14,7 @@ export async function getUserByIDService(userID: string) {
     if (!user) {
       throw new Error("Cannot find that user.");
     }
-    return {
-      name: user.name,
-      email: user.email,
-      bio: user.bio,
-      profileImage: user.avatar,
-      followersCount: user.followers.length,
-      followingCount: user.following.length,
-    };
+    return user;
   } catch (error) {
     throw new Error("Error retrieving the user info " + error)
   }

@@ -8,6 +8,7 @@ import { getUserByIDService } from "../services/getUserByIDService";
 import { updateUserService } from "../services/updateUserService";
 import { deleteUserService } from "../services/deleteUserService";
 import { searchUserService } from "../services/searchUserService";
+import { getPostsByUserService } from "../services/getPostByUserService";
 import { createNotificationService } from "../services/createNotificationService";
 import { uploadService } from "../services/uploadService";
 import {io, onlineUsers} from "../socket"
@@ -93,8 +94,10 @@ export async function getUserByIDController(req: Request, res: Response) {
     const { userId } = req.params;
 
     const user = await getUserByIDService(userId);
+    const posts = await getPostsByUserService(userId);
+   
 
-    res.status(200).json({ user });
+    res.status(200).json({ user, posts });
   } catch (error: any) {
     res.status(500).json({ message: "Error retreiving profile info." , error: error.message});
   }
