@@ -11,7 +11,7 @@ import { searchUserService } from "../services/searchUserService";
 import { getPostsByUserService } from "../services/getPostByUserService";
 import { createNotificationService } from "../services/createNotificationService";
 import { uploadService } from "../services/uploadService";
-import {io, onlineUsers} from "../socket"
+import { io, onlineUsers } from "../socket";
 import User from "../models/User";
 
 export async function createUserController(req: Request, res: Response) {
@@ -27,16 +27,19 @@ export async function createUserController(req: Request, res: Response) {
 
 export async function followUserController(req: Request, res: Response) {
   try {
-    const followerID = req.currentUser?.id
+    const followerID = req.currentUser?.id;
 
-    if(!followerID) return res.status(401)
-    .json({message: "Unauthorized"})
+    if (!followerID) return res.status(401).json({ message: "Unauthorized" });
 
     const { followingID } = req.params;
 
     await followUserService(followerID, followingID);
 
-    const notification = await createNotificationService(followingID, followerID, "follow");
+    const notification = await createNotificationService(
+      followingID,
+      followerID,
+      "follow"
+    );
 
     const receiverSocketId = onlineUsers.get(followingID);
     if (receiverSocketId) {
@@ -53,10 +56,9 @@ export async function followUserController(req: Request, res: Response) {
 
 export async function unfollowUserController(req: Request, res: Response) {
   try {
-    const followerID = req.currentUser?.id
+    const followerID = req.currentUser?.id;
 
-    if(!followerID) return res.status(401)
-    .json({message: "Unauthorized"})
+    if (!followerID) return res.status(401).json({ message: "Unauthorized" });
 
     const { followingID } = req.params;
 
@@ -74,7 +76,9 @@ export async function getFollowersController(req: Request, res: Response) {
 
     res.status(200).json({ followers });
   } catch (error: any) {
-    res.status(500).json({ message: "Error getting followers.", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error getting followers.", error: error.message });
   }
 }
 
@@ -86,15 +90,16 @@ export async function getFollowingController(req: Request, res: Response) {
 
     res.status(200).json({ followers });
   } catch (error: any) {
-    res.status(500).json({ message: "Error getting followers.", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error getting followers.", error: error.message });
   }
 }
 
 export async function getUserByIDController(req: Request, res: Response) {
   try {
     const { userId } = req.params;
-    const currentUser = req.currentUser?.id
-
+    const currentUser = req.currentUser?.id;
 
     const user = await getUserByIDService(userId);
     const posts = await getPostsByUserService(userId);
@@ -102,76 +107,99 @@ export async function getUserByIDController(req: Request, res: Response) {
     const isFollowing = await User.exists({
       _id: userId,
       followers: currentUser,
-    })
-   
+    });
 
     res.status(200).json({ user, posts, isFollowing: Boolean(isFollowing) });
   } catch (error: any) {
-    res.status(500).json({ message: "Error retreiving profile info." , error: error.message});
+    res.status(500).json({
+      message: "Error retreiving profile info.",
+      error: error.message,
+    });
   }
 }
 
 export async function updateUserController(req: Request, res: Response) {
   try {
     const userId = req.currentUser?.id;
-    const { update } = req.body;
 
-    if(!userId) return res.status(201)
-    .json({message: "Unauthorized"})
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const update: any = {
+      name: req.body.name,
+      bio: req.body.bio,
+      lookingFor: req.body.lookingFor,
+    };
+
+    if (req.body.techStack) {
+      update.techStack = JSON.parse(req.body.techStack);
+    }
+
+    if (req.file) {
+      const { url } = await uploadService(req.file, "profiles");
+      update.avatar = url;
+    }
 
     const updatedUser = await updateUserService(userId, update);
 
-    res.status(200).json({
-      message: "Succesfully updated user.",
+    return res.status(200).json({
+      message: "Successfully updated user.",
       user: updatedUser,
     });
   } catch (error: any) {
-    res.status(500).json({ message: "Error updating the user." , error: error.message});
+    return res.status(500).json({
+      message: "Error updating the user.",
+      error: error.message,
+    });
   }
 }
 
 export async function deleteUserController(req: Request, res: Response) {
   try {
-    const userId = req.currentUser?.id
+    const userId = req.currentUser?.id;
 
-    if (!userId) return res.status(401)
-    .json({message: "Unauthorized"})
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
     const deletedUser = await deleteUserService(userId);
 
     res.status(200).json({ deletedUser });
   } catch (error: any) {
-    res.status(500).json({ message: "Unable to delete the user", error: error.message});
+    res
+      .status(500)
+      .json({ message: "Unable to delete the user", error: error.message });
   }
 }
 
-export async function searchUserController(req: Request, res: Response){
+export async function searchUserController(req: Request, res: Response) {
+  try {
+    const { query, page = 1, limit = 10 } = req.params;
+    const users = await searchUserService(
+      query as string,
+      parseInt(page as string),
+      parseInt(limit as string)
+    ); // Request values are always strings so we must parse!
 
-try {
-  const {query, page = 1, limit = 10}= req.params;
-  const users = await searchUserService(query as string, parseInt(page as string), parseInt(limit as string)); // Request values are always strings so we must parse!
-
-  res.status(200).json({users});
-
-} catch (error: any) {
-  res.status(500).json({message: "Cannot search for the user.", error: error.message
-})
+    res.status(200).json({ users });
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: "Cannot search for the user.", error: error.message });
   }
-
 }
 
-
-export async function  uploadProfilePicController (req: Request, res: Response)  {
+export async function uploadProfilePicController(req: Request, res: Response) {
   try {
     const userId = req.currentUser?.id;
     if (!userId || !req.file)
       return res.status(400).json({ message: "No file uploaded" });
-
 
     const { url } = await uploadService(req.file, "profiles");
     const updatedUser = await updateUserService(userId, { avatar: url });
 
     res.status(200).json(updatedUser);
   } catch (error: any) {
-    res.status(500).json({ message: "Error uploading profile pic", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error uploading profile pic", error: error.message });
   }
-};
+}

@@ -3,6 +3,7 @@ import { createUserController, deleteUserController, followUserController, getFo
 import {verifyToken} from '../middleware/authMiddleware'
 import parser from "../middleware/upload";
 
+
 const router = Router();
 
 
@@ -12,7 +13,7 @@ router.post("/unfollow/:followingID", verifyToken, unfollowUserController)
 router.get("/:userId/followers", verifyToken, getFollowersController );
 router.get("/:userId/following", verifyToken, getFollowingController);
 router.get("/:userId/profile", verifyToken, getUserByIDController);
-router.post("/update", verifyToken, updateUserController);
+router.patch("/update", verifyToken, parser.single("avatar"), updateUserController);
 router.delete("/delete", verifyToken, deleteUserController);
 router.get("/search", verifyToken, searchUserController);
 router.put("/profile-pic", verifyToken, parser.single("image"), uploadProfilePicController);
